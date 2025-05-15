@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            background-color: #4c9397;
+            
+        }
+        h1{
+            font-family: sans-serif;
+        }
+        #container{
+            width: 400px;
+            height: 450px;
+            border: 2px solid;
+            border-radius: 20px;
+        }
+        #container>div{
+            display: flex;
+            flex-direction: row;
+            
+            align-items: center;
+            border: 1px solid;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        #addtask{
+            width: 400px;
+            height: 60px;
+            border: 2px solid;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        #addtask>input{
+            
+           width: 70%;
+           height: 70%;
+           padding-left:5px;
+           border: 1px solid rgb(141, 139, 135);
+           border-radius: 10px;
+        }
+        #addtask>button{
+            width: 12%;
+            height: 60%;
+            color: white;
+            border: 1px solid;
+            border-radius: 10px;
+            background-color: purple;
+        }
+    </style>
+</head>
+<body>
+    <h1>To Do :</h1>
+    <div id="addtask">
+    <input type="text" id="task">
+    <button onclick="addTask()">Add Task</button>
+    </div>
+    <div id="container">
+        
+    </div>
+</body>
+</html>
+<script>
+    
+    let list=document.getElementById('container');
+    window.onload= function(){
+        let taskList= JSON.parse(localStorage.getItem('items')) || [];
+        taskList.forEach((task)=>{
+            showTask(task.task,task.isCompleted);
+        })
+    }
+    function addTask(){
+        let task=document.getElementById('task').value;
+        let isCompleted=false;
+        showTask(task,isCompleted);
+        saveTaskToLocal(task,isCompleted);
+        
+    }
+    function showTask(task, isCompleted){
+        let item = document.createElement('div');
+        
+        
+        let p=document.createElement('p')
+        let del= document.createElement('button');
+        let com = document.createElement('button');
+        p.innerText=task;
+        p.style.flexGrow="1";
+        p.style.display="inline-block";
+        p.style.marginLeft="5px";
+        if(isCompleted){
+            p.style.textDecoration="line-through";  
+        }
+        del.innerText= "Delete";
+        com.style.marginRight="5px";
+        com.style.marginLeft="5px";
+        com.innerText= "Complete";
+        del.addEventListener('click',function(){
+            item.remove();
+            deleteTask(task);
+        })
+        com.addEventListener('click',function(){
+            isCompleted=true;
+            p.style.textDecoration="line-through";
+            updateTask(task,true);
+            
+        })
+        item.append(p,del,com);
+        list.append(item);
+        document.getElementById('task').value="";
+    }
+    function saveTaskToLocal(task, isCompleted){
+        let tasks= JSON.parse(localStorage.getItem(('items'))) || [];
+        tasks.push({task:task, isCompleted: isCompleted});
+        localStorage.setItem('items', JSON.stringify(tasks));
+    }
+    function deleteTask(task){
+        let tasks= JSON.parse(localStorage.getItem('items'));
+        tasks=tasks.filter((item)=> item.task!==task);
+        localStorage.setItem('items',JSON.stringify(tasks));
+    }
+    function updateTask(task,isCompleted){
+        let tasks= JSON.parse(localStorage.getItem(('items'))) || [];
+        tasks=tasks.map((item)=>{
+            if(item.task==task){
+               
+                return {task,isCompleted}
+            }
+            return item;
+        })
+        localStorage.setItem('items',JSON.stringify(tasks));
+    }
+</script>
